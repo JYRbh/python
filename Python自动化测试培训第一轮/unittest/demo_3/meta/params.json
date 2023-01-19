@@ -1,0 +1,18 @@
+
+{
+  "protocol_range": "firmware, gateway",
+  "protocol": "firmware",
+  "mod_model_range":"wr3, wbr3, wbr3d, wb3s, xr3, wrg1, e3s, bl608, cbu, wr3l",
+  "mod_model": "wb3s",
+  "user_baudrate": 115200,
+  "borad_type_range": "big, small, relay, gpio",
+  "board_type": "big",
+  "eth0_default_addr": "192.168.3.14",
+  "log_cookie": "e255ad9b8262a02d28bca48235a96357=111116622; 7ce0ff06556c05363a176b03dfdd5680=4568; a608ea7c4cbd1919ce039822a2e5d753=04568; cd1f6c4c522c03e21ad83ee2d7b0c515=Furion%EF%BC%88%E9%87%91%E9%91%AB%EF%BC%89; _tpmGuid=TY-09729dd35e1f6afb; COOKICE_USER_TOKEN_PC=ss_cx33QMyjCVTj8SKatCujCSREWZyh0rcIO3zrS88XbWlSUwvXqzEDekXfM7aHJ0wiQKcDzDkVpYhbssQiY8ihq6CL-DWQnR7_8hiYB_TCxjHIT2Fj40Kzy6xFvfJ_CrwcXPw1RAAfA46AeBKc_4_akVDOUKCKOjlgbhGpfw; username=4568; userId=111116622; staffId=1384327585294524416; useremp=4568; nickname=Furionï¼ˆé‡‘é‘«ï¼‰; _tpmSid=1384327585294524416; SSO_USER_TOKEN=ss_GQ8Q-CtMQ4VwiEgXqLIxRkNC6DvRFBDJ3d2n23i0hl9CWdT_VxTqODCJZDoS2f3AcBZ0bB_OjRvf5BRs_OQzZ8Fv3pCUvjN7azfYZY36JGd0DbiGKBppk4dmgZPA9oPeK8nlW59HtrD8k8Sc59P8LAwOjpSw5Q",
+  "token_info": {},
+  "low_mode": "disable",
+  "ffs_run": false,
+  "outlet_mac": "5c:cf:7f:35:14:3c",
+  "mod_mac": "",
+  "mod_id": "00316615dc4f22e1fc93"
+}

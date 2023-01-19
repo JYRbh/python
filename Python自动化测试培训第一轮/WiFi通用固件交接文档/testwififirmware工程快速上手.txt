@@ -1,0 +1,261 @@
+
+温馨提示：
+手工用例都没执行过的老铁，不要吝惜您的宝贵时间，先执行一次手工用例，不然会事倍功半的。 自动化是基于业务逻辑的，技术上难度不大，但是业务要求高，能写出这块自动化的，基本表示这块手工去测试也不会有问题的。
+
+====================================
+0. 简介
+一个运行于树莓派，可独立调试，也可以对接研测平台的，python自动化用例集。
+
+====================================
+1. 范围
+主要覆盖通用固件，基线，网关协议用例。
+
+====================================
+2. 分层
+包括组件(component)、业务（service）、数据（dao）、用例逻辑（controller）、用例管理（testcase）、环境数据（meta）
+
+====================================
+3.环境安装
+1)树莓派环境搭建：
+参考：
+https://wiki.tuya-inc.com:7799/page/53841948
+
+2)测试工程环境搭建：
+
+gitlab账号可在网址：https://registry.code.tuya-inc.top/ 根据提示申请账号：
+
+测试工程代码权限找测试经理小码(李军)开通
+
+测试工程gitlab地址：
+https://registry.code.tuya-inc.top/tuya_embedded_automation/project/testwififirmware
+
+
+git代码下载地址：
+https://registry.code.tuya-inc.top/tuya_embedded_automation/project/testwififirmware.git
+提示：git客户端下载，参考百度
+
+
+使用pycharm对测试工程远程调试：
+提示：只有pycharm专业版才有远程调试功能，如何安装，参考百度
+
+远程调试参考：
+https://wiki.tuya-inc.com:7799/page/53841973
+
+提示：wifi模块接线这块不熟的，wifi基线组同学咨询下即可
+
+
+调试环境安装检测：
+环境安装完毕，可以通过pycharm deployment->upload to 树莓派，进入testcase/afirmware/aprotocol1/test_protocol1_a_function.py 找个用例，右键run一把，如果返回成功，表示环境安装完成
+
+
+====================================
+4. 用例管理层介绍(testcase)
+
+用于存放管理用例，组织用例顺序，也是用例调试执行入口。使用unittest, 可以以包，模块，类，函数来多层次管理用例。 
+unittest根据ascii码来调节用例顺序。本工程根据unittest.TestCase类的assertEqual来判断用例执行结果。
+setUp为用例设置运行环境
+tearDown为用例清理运行环境
+行数首行的注释，基本能反馈该用例的测试步骤
+
+1）afirmware （通用固件用例集）
+aprotocol1  主要包括协议类测试
+bprotocol2  根据模块状态划分的协议类测试
+cactivate   配网测试
+dexpand     通用固件扩展类协议
+edp         dp点测试
+fabnormaldp dp点异常测试
+hmode       wifi模块各种模式切换
+mbaudrate   波特率自适应功能
+vsersion    版本兼容测试
+
+2）base (基线用例集)
+aactivate  基线配网测试
+bdp        dp点测试
+eremove    移除测试
+fmode      模式切换测试
+hreconnect 回连测试
+irouter1   路由器兼容测试1
+jrouter2   路由器兼容测试2
+ktimer     定时测试
+ologseq    日志序测试
+
+3）cunstable (不稳定用例)
+因为模块返回不确定导致的不稳定用例集合
+
+4）dstress （压测）
+adpstress dp压测,基础协议压测
+egwdpstress dp正常异常压测
+h5gstress 5g回连，多次重试，以及dp压测
+还包含配网，重置，定时，快联，蓝牙等相关压测
+
+5）elong (长运)
+包含配网后长时间监测，异常后长时间监测，5g长时间后回连
+
+6）hgwcommon (网关相关)
+agwprotocol  网关基础指令测试
+bsubdevice   网关子设备测试
+cgwbraudrate 网关波特率自适应
+dgwdpissueandreport 网关dp测试
+
+7) m5g （5g相关用例）
+包括5g配网，模式切换，加密，dp功能
+
+8）nffs （ffs配网用例）
+ffs配网相关用例
+
+9）xble (蓝牙相关用例)
+adeplopy 蓝牙配网
+bcontrol 蓝牙发送dp
+plug_play plug&play功能
+
+
+====================================
+5. 用例逻辑层介绍（controller）
+
+用例相关步骤在该层进行组织。
+该层会调用很多service层的一些单功能接口，组织成真实的测试场景，对照手工测试用例，通过对service接口的拼接，能快速组织用例。
+部分用例步骤较为相似，为减少重复代码，做了一定的抽象与功能组合。
+该层代码，分模块根据业务内容，与基线还是通用固件无关
+包的命令以controller_业务名方式，根据业务名，模块名，函数名，可以快速与业务功能联系出对应的测试用例场景
+
+
+====================================
+6. 环境数据介绍 (meta)
+
+pip 包含难下载的包，跟内部包
+param.json参数解释
+protocol: 协议类型，目前适配通用固件跟网关协议
+mod_model: 模组型号，有根据不同模组，做特殊处理的情况
+user_baudrate: 用户口波特率，非自适应的模块，需要填写
+board_type： 开发板类型，big：就是那个比板砖还大的板子，small：陆渴大佬做的板子，relay:接继电器，gpio：陈远理老板上下电方案
+eth0_default_addr:  给树莓派绑定默认ip
+log_cookie: 日志序测试前，需要先去 涂鸦运营平台> 日志平台，f12搞个cookie, 如果不知道怎么操作，求助百度吧
+token_info: 对接研测平台的一个保留参数
+low_mode:  打开这个功能，相当于协议中模式的low字段为1，不清楚通用固件协议的，自己去要份
+ffs_run: 是否有ffs功能，ffs需要搭建专门的环境才能测试
+outlet_mac: ffs用的插座的mac地址，配网成功后，自己从app端搞，当然每个环境只需搞定一次，自己拿小本本记着就行
+
+requirements.txt
+里面有测试工程依赖包的具体版本，在平台执行用例时候用到
+
+
+
+====================================
+7 数据层介绍 (dao)
+
+一些基础参数配置，并不直接来自外部参数，而是来自此处。
+config_api: 其他模块需要使用外部参数时从中获取
+config_init: 需要根据平台查询的配置信息，以及初始化配置
+service_config: 账号信息，产品schema等一些可以固定不变的参数，来自此文件
+
+
+====================================
+8 业务逻辑层介绍 (service)
+
+很多单功能步骤会在该进行生成。可以理解为用例逻辑层的一些接口。用例逻辑层就是根据，service_api中函数进行拼接形成的。新接入业务，可能会需要增加service_api中的接口。想要速成用例，必须合理利用service_api中的接口。了解目前已经实现的接口，就能明白目前自动化工程所具备的用例覆盖能力。除了对外的service_api, 该层很多内容就是为实现service_api而展开的。也有很多service_api来自组件能力。
+
+
+service_api 介绍: 
+activate_serviceapi: 主要实现了app配网、串口配网、插座配网功能接口
+dp_serviceapi: 主要实现了，dp上报, dp下发， dp查询功能，还包括插座dp点下发
+excel_seriveapi: 主要实现存储重置结果excetl表
+expand_serviceapi: 主要实现清理扩展协议的残留数据清理
+globalvar_serviceapi: 主要实现了获取模块重启次数
+heatbeat_serivceapi: 主要实现了获取心跳次数，获取心跳状态，打开心跳重试等心跳相关接口
+iot_seriveapi: 主要实现了登录账号密码设置
+mode_serviceapi: 主要实现了，模组的模式切换
+modinfo_seriveapi: 主要实现了 快联日志，模组连接状态等从模组日志中能获取的信息
+modstate_serviceapi: 主要实现了模组处于启动，初始化，工作，配网状态获取
+netstate_serviceapi: 主要实现了，模组网络状态的设置，与查询
+network_serviceapi: 主要实现了，打开关闭路由，打开关闭网络等修改路由器相关功能
+power_serviceapi: 主要实现了，上下电功能
+product_serviceapi: 主要实现了，模组产品信息的获取与设置功能以及工作模式
+protocol_serviceapi: 主要实现了，获取内存，mac,信号强度，重置等协议指令功能
+query_serviceapi: 主要实现了，设置获取一些测试工程系统内部状态功能
+queue_serviceapi: 主要实现了，串口服务使用队列实现的数据交互方法
+remove_serviceapi: 主要实现了，app对模块移除，恢复出厂设置
+sdk_serviceapi: 主要实现了，app sdk的登录参数设置与启动
+serialvar_serviceapi: 主要实现了，模块与树莓派之间的串口信息记
+sysinit_serviceapi: 主要实现了，测试工程启动时的一些初始化
+tread_serviceapi: 主要实现了，串口服务线程的启动与停止
+timer_serviceapi: 主要实现了，定时器增加查询，删除功能
+weather_serviceapi: 主要实现了，天气数据获取，下发，以及天气状态获取
+wiring_serviceapi: 主要实现了，大板子自动接线功能
+
+
+====================================
+9 组件层介绍 (component)
+
+该层主要是一些独立功能模块，不涉及多端交互，可独立使用。
+
+ble: wifi蓝牙双模，包含蓝牙的基础功能
+
+debugger:
+类似于桌面串口调试助手,模拟MCU与模块之间进行数据交互。
+1）clearlogs : 未防止日志文件过大的日志清理模块
+2) comment: 与调试助手类似，模块在接收与发送的指令都有对应中文提示，为了方便查看
+3）common: 串口服务的通用处理
+4）dealmodinfo: 模组日志信息在此进行处理
+5) dealuserinfo: 接收到的串口数据在此进行处理
+6）debugger_api: 串口服务的对外功能，service层调用的基础协议指令入口
+7）modmanage:  模块所处的状态查询与监控
+8）protocolparse: 对接收的串口指令进行解析，检测是否符合预期
+9）serialoperate: 串口数据收发读取，写入
+10）threadmanage: 串口服务，日志等线程管理
+11）var: 串口服务的内部变量
+
+iotcloud:
+云端打通的一些atop接口。主要包括定时，移除功能。
+
+logplaform:
+日志平台接口，在获取日志序时使用，查询日志信息。但是需要配置cookies
+
+logs:
+测试用例在调用testlog, modlog等日志方法后运行后会在/tmp/logs目录记录各种运行日志。 包括测试日志，模块日志，hostapd日志，串口交互日志，串口原始收发日志。
+
+network:
+通过网络软件实现的对树莓派网络wlan0的操作。 主要包括打开断开路由器以及网络。在service使用时调用network_api接口
+
+power:
+实现的多种电源接入方式,来控制模块的上下电功能，调用入口power_api
+
+sdk:
+由画十移植的树莓派上的sdk版本，实现app上的功能。测试工程在初始化时，会启动sdk。主要使用其中的下发dp点，以及查询dp功能。
+
+testplatform:
+研测平台对接入口。研测平台提供的查询接schema口，当前版本未使用.
+
+wiring
+大板子接线功能。可以根据模块mod_model确定不同的接线方法。设置接口来自于autopi树莓派平台。
+
+
+模块网络状态解释：
+跟模块数字状态相比，英文单词方式更加容易记住
+ez: 处于ez配置状态
+ap: 处于ap配置状态
+ezap: 处于ezap共存状态（需要产品信息中设置该模式）
+norouter: 处于未连上路由状态
+router: 处于连上路由，未连上云端状态
+cloud: 处于连上云端状态
+
+衍生的模块网络状态:
+因为部分模块在配网前与配网后，虽然模块处于同一状态，但是表现形式不一致，为了保证测试完整性，添加各种状态
+norouter0： 
+未经连云激活成功的模块（重置过的也是未激活状态，例如：配网过程中有该状态），当前处于未连上路由状态
+norouter1: 
+已连云激活成功的模块（激活后，未经重置的模块，例如：连云之后断开路由器有该状态），当前处于未连上路由状态
+router0:
+未经连云激活成功的模块（重置过的也是未激活状态，例如：配网过程中有该状态），当前处于连上路由，未连上云端状态
+router1:
+未经连云激活成功的模块（激活后，未经重置的模块，，例如：连云之后断开外网有该状态），当前处于连上路由，未连上云端状态
+serialcloud: 通过串口配网成功，当前处于连上云端状态 
+serialcloud_ez: 模块处于ez状态，通过串口配网成功，当前处于连上云端状态
+serialcloud_ap: 模块处于ap状态，通过串口配网成功，当前处于连上云端状态
+appcloud: 通过app配网成功，当前处于连上云端状态 
+appcloud_ez: 模块处于ez状态，通过app配网成功，当前处于连上云端状态
+appcloud_ap: 模块处于ap状态，通过app配网成功，当前处于连上云端状态
+cloud_reconnect： 激活成功后，模块因为环境或者自身机制，导致状态不是连云。但是在未经过串口配网或者app配网的情况下，再次连上了云端。
+
+
+
+

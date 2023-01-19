@@ -1,0 +1,8 @@
+desired_caps:
+  platformName:Android,
+  platformVersion:6.0.1,
+  deviceName:127.0.0.1:7555,
+  appPackage:com.netease.cloudmusic,
+  appActivity:module.login.LoginActivity,
+  automationName:UiAutomator1,
+  noReset:True
